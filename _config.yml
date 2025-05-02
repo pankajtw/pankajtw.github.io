@@ -31,13 +31,13 @@ github_username:  pankajtw
 
 # Build settings
 
-remote_theme: pages-themes/midnight@v0.2.0
+theme: minima
 
 plugins:
-  - jekyll-remote-theme
+  - jekyll-feed
+  - jekyll-seo-tag
 
 # Optional: Social + SEO tweaks
-author: Pankaj Kumar
 markdown: kramdown
 
 # Exclude from processing.
