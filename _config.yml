@@ -30,7 +30,7 @@ twitter_username: Pankajhbk007
 github_username:  pankajtw
 
 # Build settings
-theme: cayman
+theme: jekyll-theme-midnight
 plugins:
   - jekyll-feed
 
