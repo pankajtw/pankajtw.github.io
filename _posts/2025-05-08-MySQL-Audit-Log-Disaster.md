@@ -1,8 +1,10 @@
 ---
+layout: post
 title: "When a MySQL Replica Became Primary and Blew Up the Disk with Audit Logs"
-date: 2025-05-09
+date: 2025-05-08
 tags: [mysql, percona, audit-log, replication]
 ---
+
 
 
 # 🚨 When a MySQL Replica Became Primary and Blew Up the Disk with Audit Logs
