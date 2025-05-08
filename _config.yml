@@ -32,7 +32,12 @@ github_username:  pankajtw
 
 # Build settings
 
+sass:
+ style: compressed
+
 theme: minima
+ include_css:
+  - /assests/css/custom.css
 
 plugins:
   - jekyll-feed

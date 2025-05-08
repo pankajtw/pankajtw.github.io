@@ -1,6 +1,8 @@
 .about-photo {
   width: 150px;
+  height: 150px;
   border-radius: 50%;
+  object-fit: cover;
   margin-bottom: 1rem;
 }
 
