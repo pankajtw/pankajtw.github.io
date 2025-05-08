@@ -11,8 +11,8 @@ In this post, I'll walk you through how I did a MySQL primary promotion using GT
 
 ![MySQL Replication Topology](/assests/images/replication_topology.png)
 
-* One primary MySQL instance
-* Four replicas, each potentially having errant GTIDs due to historical promotion/demotion cycles or unclean state
+* One primary MySQL instance: prod-db01
+* Four replicas: prod-db02, replica-db03, replica-db04, replica-db05 (each potentially having errant GTIDs due to historical promotion/demotion cycles or unclean state)
 
 
 
@@ -28,20 +28,23 @@ An errant GTID is a GTID that exists on a replica but not on the current primary
 
 When promoting a new primary, all replicas must have only the GTIDs that also exist on the new primary (or a subset of them).
 
+
 ## Step-by-Step: Promoting a New Primary with GTID
 
 Assume the following GTID sets:
 
 ```text
-Old Primary: Executed GTID set: abc:1-12345, def:1-123
-Replica 1  : Executed GTID set: abc:1-12345, def:1-123, ghi:1-50
-Replica 2  : Executed GTID set: abc:1-12345, def:1-123, ijk:1-100
-Replica 3  : Executed GTID set: abc:1-12345, def:1-123, lmn:1-500
+prod-db01  (old primary): Executed GTID set: abc:1-12345, def:1-123
+prod-db02             : Executed GTID set: abc:1-12345, def:1-123
+replica-db03          : Executed GTID set: abc:1-12345, def:1-123, ghi:1-50
+replica-db04          : Executed GTID set: abc:1-12345, def:1-123, ijk:1-100
+replica-db05          : Executed GTID set: abc:1-12345, def:1-123, lmn:1-500
 ```
 
-We're choosing **Replica 1** as the new primary. This means we need to:
 
-1. Inject the missing GTIDs (ghi:1-50, ijk:1-100, lmn:1-500) as empty transactions into Replica 1.
+We're choosing **prod-db02** as the new primary. This means we need to:
+
+1. Inject the missing GTIDs (ghi:1-50, ijk:1-100, lmn:1-500) as empty transactions into prod-db02.
 2. Point the other replicas to this new primary.
 
 ### Step 1: Inject Errant GTIDs into the New Primary
@@ -80,13 +83,13 @@ Repeat this for `ghi:1-50` and `lmn:1-500`.
 
 ### Step 2: Configure Replication on Remaining Replicas
 
-On **Replica 2** and **Replica 3**:
+On **replica-db03**, **replica-db04**, and **replica-db05**:
 
 ```sql
 STOP REPLICA;
 RESET REPLICA ALL;
-CHANGE REPLICATION SOURCE TO
-  SOURCE_HOST='replica1.host',
+CHANGE REPLICATION SOURCE TO 
+  SOURCE_HOST='prod-db02',
   SOURCE_USER='replica_user',
   SOURCE_PASSWORD='*****',
   SOURCE_AUTO_POSITION=1;
@@ -141,6 +144,6 @@ This strategy was tested on a live environment with multi-TB datasets and worked
 
 ---
 
-Let me know in the comments if you want a script bundle for promotion automation.
+Let me know your thoughts, questions in the comments
 
 Happy Replicating!
