@@ -19,11 +19,12 @@
 
 title: The DataNinja
 email: pankajk1608@gmail.com
-description: "Mostly about databases like MySQL and all it's features like
-GTID, replication, high availabilty, Disaster recovery. Also about olap 
-databases like Snowflake, distributed database systems, event driven architecture
-like kafka, cloud infrastructure like AWS, RDS, S3. CDC from relational Database
-into a data warehousing solutions" 
+description: >
+  Deep dives into database technologies like MySQL, GTID replication, high availability,
+  and disaster recovery. Also covering OLAP solutions like Snowflake, distributed systems,
+  Kafka-based event-driven architectures, and cloud infrastructure using AWS services like
+  RDS, S3, and CDC pipelines into modern data warehouses.
+
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://pankajtw.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: Pankajhbk007
