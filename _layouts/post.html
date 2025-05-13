@@ -36,31 +36,22 @@ layout: base
     {{ content }}
   </div>
 
-  {% if jekyll.environment == 'production' -%}
-    {% if page.comments == false -%}
-    <div class="comments-disabled-message">
-      Comments have been disabled for this post.
-    </div>
-    {% else -%}
-      {%- include comments.html -%}
-    {% endif -%}
-  {% endif -%}
+  <hr>
+  <h2>Comments & Reactions</h2>
+  <div id="giscus_container"></div>
+  <script src="https://giscus.app/client.js"
+          data-repo="pankajtw/pankajtw.github.io"
+          data-repo-id="R_kgDOOjb6RQ"
+          data-category="General"
+          data-category-id="DIC_kwDOOjb6Rc4CqGGG"
+          data-mapping="pathname"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-theme="preferred_color_scheme"
+          crossorigin="anonymous"
+          async>
+  </script>
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
-<hr>
-<h2>Comments & Reactions</h2>
-<div id="giscus_container"></div>
-<script src="https://giscus.app/client.js"
-        data-repo="pankajtw/pankajtw.github.io"
-        data-repo-id="R_kgDOOjb6RQ"
-        data-category="General"
-        data-category-id="DIC_kwDOOjb6Rc4CqGGG"
-        data-mapping="pathname"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-theme="preferred_color_scheme"
-        crossorigin="anonymous"
-        async>
-</script>
-
 </article>
+
