@@ -7,13 +7,11 @@ tags: [mysql, percona, audit-log, replication]
 
 
 
-# 🚨 When a MySQL Replica Became Primary and Blew Up the Disk with Audit Logs
-
 During a scheduled maintenance window on a Saturday, I promoted one of our MySQL replicas to act as the new **primary**. Everything went smoothly — replication was caught up, `read_only` was disabled, writes were flowing in, and the app stayed healthy.
 
 But come Monday morning, we were greeted with a nasty surprise:
 
-> **Disk space alert 🔥: `/mnt/DATABASE` usage > 90%**
+> **Disk space alert : `/mnt/DATABASE` usage > 90%**
 
 A quick investigation revealed the root cause:
 
@@ -21,7 +19,7 @@ A quick investigation revealed the root cause:
 
 ---
 
-## 💣 What Went Wrong
+##  What Went Wrong
 
 The promoted replica had **Percona’s Audit Log plugin** enabled with the following configuration:
 
@@ -48,9 +46,9 @@ And since **rotation was disabled**, the log just kept growing... until it ate 2
 
 ---
 
-## 🔧 How We Fixed It (Without Restarting MySQL)
+##  How We Fixed It (Without Restarting MySQL)
 
-### ✅ 1. Confirmed the audit log file path
+### 1. Confirmed the audit log file path
 
 ```bash
 mysql -e "SELECT @@datadir;"
@@ -66,7 +64,7 @@ The actual file path turned out to be:
 
 ---
 
-### ✅ 2. Verified that MySQL was still writing to it
+### 2. Verified that MySQL was still writing to it
 
 ```bash
 sudo lsof /mnt/DATABASE/mysql/audit.log
@@ -76,7 +74,7 @@ This showed that the `mysqld` process still had the file open, so we **couldn't 
 
 ---
 
-### ✅ 3. Safely truncated the log file in place
+### 3. Safely truncated the log file in place
 
 ```bash
 sudo truncate -s 0 /mnt/DATABASE/mysql/audit.log
@@ -88,7 +86,7 @@ Since we were using `audit_log_strategy = ASYNCHRONOUS`, the server didn’t min
 
 ---
 
-### ✅ 4. (Optional) Rotated logs manually
+### 4. (Optional) Rotated logs manually
 
 To force MySQL to start a new log file immediately:
 
@@ -98,9 +96,9 @@ FLUSH AUDIT_LOGS;
 
 ---
 
-## 🛡️ How We Prevented This from Happening Again
+## How We Prevented This from Happening Again
 
-### 🔁 Enabled audit log rotation:
+### Enabled audit log rotation:
 
 ```sql
 SET GLOBAL audit_log_rotate_on_size = 1073741824;  -- Rotate at 1GB
@@ -115,7 +113,7 @@ audit_log_rotate_on_size = 1073741824
 audit_log_rotations = 5
 ```
 
-### 📉 Reduced audit verbosity (optional)
+### Reduced audit verbosity (optional)
 
 If not all queries need to be logged, consider switching:
 
@@ -125,7 +123,7 @@ SET GLOBAL audit_log_policy = LOGINS;  -- Only log login events
 
 ---
 
-## 🧠 Takeaways
+## Takeaways
 
 This incident was a great reminder that **promoting a replica to primary is not just a replication config change** — it comes with a shift in **operational responsibilities**, including:
 
@@ -134,9 +132,9 @@ This incident was a great reminder that **promoting a replica to primary is not 
 - Log generation
 - Backup behaviors
 
-### ✅ Always check:
+### Always check:
 
-| ✅ Checklist Before Promotion |
+| Checklist Before Promotion |
 |-----------------------------|
 | Are audit/slow/general logs enabled? |
 | Are there hardcoded log paths or retention gaps? |
@@ -145,7 +143,7 @@ This incident was a great reminder that **promoting a replica to primary is not 
 
 ---
 
-## 🧰 Bonus: Truncate Log File via Cron (Failsafe)
+## Bonus: Truncate Log File via Cron (Failsafe)
 
 Until you're confident with log rotation, this cron can be your insurance:
 
@@ -155,7 +153,7 @@ Until you're confident with log rotation, this cron can be your insurance:
 
 ---
 
-## 💬 Final Thoughts
+## Final Thoughts
 
 We averted a major production impact because we caught it early Monday — but in a different scenario, **2.1TB of audit logs could’ve taken the server offline**.
 
