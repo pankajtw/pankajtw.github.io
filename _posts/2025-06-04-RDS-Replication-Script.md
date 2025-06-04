@@ -55,7 +55,8 @@ Build a script to:
 
 ## 📝 The Script
 
-```bash
+{% raw %}
+{% highlight bash %}
 #!/bin/bash
 set -euo pipefail
 
@@ -145,4 +146,6 @@ echo "[5] Setting up replication"
 mysql -h "$RDS_ENDPOINT" -u "$RDS_MASTER_USER" -p"$RDS_MASTER_PASSWORD" <<EOF
 CALL mysql.rds_set_external_master_with_auto_position('${ONPREM_HOST}', ${ONPREM_PORT}, '${REPL_USER}', '${REPL_PASSWORD}', 0, 0);
 CALL mysql.rds_start_replication();
-EOF```
+EOF
+{% endhighlight %}
+{% endraw %}
