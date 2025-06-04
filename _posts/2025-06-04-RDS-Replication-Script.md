@@ -40,7 +40,7 @@ Build a script to:
 3. **MySQL Backup User**
     ```sql
     CREATE USER 'xtrabackup_user'@'%' IDENTIFIED BY '*****';
-    GRANT RELOAD, LOCK TABLES, PROCESS, REPLICATION CLIENT, REPLICATION SLAVE, BACKUP_ADMIN ON *.* TO 'xtrabackup_user'@'%';
+    GRANT SELECT, RELOAD, LOCK TABLES, PROCESS, REPLICATION CLIENT, REPLICATION SLAVE, BACKUP_ADMIN ON *.* TO 'xtrabackup_user'@'%';
     ```
 
 4. **GTID Mode Enabled**
