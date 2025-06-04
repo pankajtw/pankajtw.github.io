@@ -148,7 +148,7 @@ CALL mysql.rds_start_replication();
 EOF
 ```
 
-Key Considerations
+## Key Considerations
 
 - The backup must not be compressed (--compress is not supported by RDS restore)
 
@@ -160,6 +160,6 @@ Key Considerations
 
 - Uploading via xargs -P 8 ensures efficient concurrency
 
-Summary
+## Summary
 
 This setup helped us streamline disaster recovery for MySQL into Amazon RDS. The script is production-ready and can be scheduled via cron or integrated into a backup orchestration workflow.
