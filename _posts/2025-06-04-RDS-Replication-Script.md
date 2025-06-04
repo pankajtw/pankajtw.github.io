@@ -8,7 +8,7 @@ Setting up a disaster recovery (DR) pipeline between your on-premise MySQL datab
 
 ---
 
-## 🧭 Goal
+## Goal
 
 Build a script to:
 
@@ -19,7 +19,7 @@ Build a script to:
 
 ---
 
-## 🔧 Pre-requisites
+## Pre-requisites
 
 1. **AWS CLI Setup**
     ```bash
@@ -53,7 +53,7 @@ Build a script to:
 
 ---
 
-## 📝 The Script
+## The Script
 
 ```
 #!/bin/bash
@@ -147,3 +147,19 @@ CALL mysql.rds_set_external_master_with_auto_position('${ONPREM_HOST}', ${ONPREM
 CALL mysql.rds_start_replication();
 EOF
 ```
+
+Key Considerations
+
+- The backup must not be compressed (--compress is not supported by RDS restore)
+
+- Use --slave-info to capture GTID state
+
+- Your RDS parameter group must have gtid_mode=ON
+
+- Use split with --bytes=10240MB to avoid multipart size limits on S3
+
+- Uploading via xargs -P 8 ensures efficient concurrency
+
+Summary
+
+This setup helped us streamline disaster recovery for MySQL into Amazon RDS. The script is production-ready and can be scheduled via cron or integrated into a backup orchestration workflow.
