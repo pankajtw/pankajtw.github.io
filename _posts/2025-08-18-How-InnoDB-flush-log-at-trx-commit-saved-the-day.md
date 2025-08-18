@@ -26,6 +26,7 @@ I logged into the Ubuntu server and started with `iostat`:
 
 ```bash
 iostat -x 1 5
+```
 
 ![iostat output](/assests/images/iostat.png)
 
@@ -80,7 +81,7 @@ Here’s the difference:
 
 =2 → Redo log write per commit, fsync once per second → huge IOPS savings, but risk of losing up to 1 second of transactions in case of a crash.
 
-Final Thoughts
+## Final Thoughts
 
 This was a good reminder that MySQL’s default settings are tuned for safety, not performance. Knowing how InnoDB’s redo log flushing works, and when to adjust it, can save you from unnecessary I/O bottlenecks.
 
