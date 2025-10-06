@@ -7,16 +7,14 @@ categories: mysql ubuntu devops
 
 ## Background
 
-After upgrading some of our production servers to **Ubuntu 24.04 (Noble)**, we began noticing **unexpected MySQL restarts** during routine package updates.  
-This was extremely concerning because these restarts happened *without any DBA action* and caused disruption on live workloads.
-
+After upgrading some of our production servers to **Ubuntu 24.04 (Noble)**, we began noticing **unexpected MySQL restarts** during routine package updates. This was extremely concerning because these restarts happened *without any DBA action* and caused disruption on live workloads.
 On investigation, we found the culprit: a change in the behavior of the [`needrestart`](https://discourse.ubuntu.com/t/needrestart-changes-in-ubuntu-24-04-service-restarts/44671) package.
 
 ---
 
 
 
-In Ubuntu 24.04, `needrestart` now restarts services automatically during `apt upgrade` or `unattended-upgrades`.  Previously, in non-interactive mode, it only reported which services
+In Ubuntu 24.04, `needrestart` now restarts services automatically during `apt upgrade` or `unattended-upgrades`.Previously, in non-interactive mode, it only reported which services
 needed restarting but **did not actually restart them**.This change was meant to improve patch hygiene, but for production databases, it’s dangerous—because MySQL can be bounced in the
  middle of heavy traffic.
 
@@ -25,17 +23,17 @@ needed restarting but **did not actually restart them**.This change was meant to
 ## Symptoms We Observed
 
 Here’s what we saw in the **MySQL error log**:
-```text
-2025-09-23T06:03:25.902608Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>.Shutting down mysqld (Version: 8.0.43-34).
-```
-
-
-There was no corresponding high load, crash, or OOM event.  
-Instead, in `/var/log/messages` we saw systemd/dbus activity triggered during package operations:
 
 ```text
-2025-09-23T06:03:25.424042+00:00 prod-mysql-shard dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit'unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
+2025-09-23T06:03:25.902608Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.0.43-34).
 ```
+
+Instead, in `/var/log/messages` we saw systemd/dbus activity during package operations:
+
+```text
+2025-09-23T06:03:25.424042+00:00 ps-prod-shard3-main-db02 dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit' unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
+```
+
 This confirmed that it was **not an internal MySQL crash** but an **external restart trigger**.
 
 We later saw similar patterns across multiple servers whenever unattended upgrades applied security patches.
