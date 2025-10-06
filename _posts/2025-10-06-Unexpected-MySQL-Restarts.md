@@ -14,9 +14,7 @@ On investigation, we found the culprit: a change in the behavior of the [`needre
 
 ---
 
-In Ubuntu 24.04, `needrestart` now restarts services automatically during `apt upgrade` or `unattended-upgrades`.  
-Previously, in non-interactive mode, it only reported which services needed restarting but **did not actually restart them**.
-
+In Ubuntu 24.04, `needrestart` now restarts services automatically during `apt upgrade` or `unattended-upgrades`. Previously, in non-interactive mode, it only reported which services needed restarting but **did not actually restart them**.
 This change was meant to improve patch hygiene, but for production databases, it’s dangerous—because MySQL can be bounced in the middle of heavy traffic.
 
 ---
@@ -35,7 +33,7 @@ There was no corresponding high load, crash, or OOM event.
 Instead, in `/var/log/messages` we saw systemd/dbus activity triggered during package operations:
 
 ```text
-2025-09-23T06:03:25.424042+00:00 ps-prod-shard3-main-db02 dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit' unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
+2025-09-23T06:03:25.424042+00:00 mysql-prod-shard dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit' unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
 ```
 This confirmed that it was **not an internal MySQL crash** but an **external restart trigger**.
 
@@ -86,10 +84,10 @@ This disables the forced auto-restart and brings back the safer reporting-only b
 ## Closing Thoughts
 
 What looked like random MySQL crashes turned out to be a **silent policy change in Ubuntu 24.04**.  
-Lesson learned: **always review post-upgrade defaults of critical packages** like `needrestart`.  
+Lesson learned: **always review the upgrade notes and the features introduced before doing an OS upgrade for your critical services
 
 This experience reinforced our principle:  
-➡️ *Production DBs must never be restarted automatically by the OS.*  
+*Production DBs must never be restarted automatically by the OS.*  
 
 Have you faced something similar on Ubuntu 24.04? Let me know in the comments.
 
