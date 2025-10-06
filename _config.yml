@@ -47,6 +47,13 @@ plugins:
 
 # Optional: Social + SEO tweaks
 markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    line_numbers: false
 
 # Exclude from processing.
 # The following items will not be processed, by default.

@@ -25,18 +25,18 @@ This change was meant to improve patch hygiene, but for production databases, it
 
 Here’s what we saw in the **MySQL error log**:
 
+```text
 2025-09-23T06:03:25.902608Z 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>.
- Shutting down mysqld (Version: 8.0.43-34).
+Shutting down mysqld (Version: 8.0.43-34).
+```
 
 
 There was no corresponding high load, crash, or OOM event.  
 Instead, in `/var/log/messages` we saw systemd/dbus activity triggered during package operations:
 
-
-2025-09-23T06:03:25.424042+00:00 ps-prod-shard3-main-db02 dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit'
-unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
-
-
+```text
+2025-09-23T06:03:25.424042+00:00 ps-prod-shard3-main-db02 dbus-daemon[2045]: [system] Activating via systemd: service name='org.freedesktop.PackageKit' unit='packagekit.service' requested by ':1.297' (uid=0 pid=1227540 comm="/usr/bin/gdbus call --system --dest org.freedesktop.PackageKit" label="unconfined")
+```
 This confirmed that it was **not an internal MySQL crash** but an **external restart trigger**.
 
 We later saw similar patterns across multiple servers whenever unattended upgrades applied security patches.
@@ -58,14 +58,16 @@ We restored the old behavior by **editing**:
 **File:** `/etc/apt/apt.conf.d/99needrestart`
 
 ### Before
-```conf
-DPKg::Post-Invoke { "if [ -x /usr/sbin/needrestart ]; then /usr/sbin/needrestart -m u; fi"; };
 
+```bash
+DPKg::Post-Invoke { "if [ -x /usr/sbin/needrestart ]; then /usr/sbin/needrestart -m u; fi"; };
+```
 
 ### After
 
+```bash
 DPKg::Post-Invoke { "if [ -x /usr/sbin/needrestart ]; then /usr/sbin/needrestart; fi"; };
-
+```
 
 This disables the forced auto-restart and brings back the safer reporting-only behavior.
 
