@@ -21,7 +21,7 @@ On the **primary**, it runs in update mode:
   --sentinel=/tmp/pt-heartbeat-sentinel \
   --log=/var/log/mysql/pt-heartbeat.log \
   --interval=0.01 --update
-bash
+```
 
 
 On replicas, it runs with --monitor.
@@ -36,7 +36,7 @@ We defined the log path explicitly using the --log flag and rotated logs using /
     rotate 5
     ...
 }
-bash
+```
 
 ## The Issue: Disk Space Bloat Due to Orphaned File Descriptors
 
@@ -53,14 +53,14 @@ root@prod-mysql-01:/home/pakumar# ls -lah /var/log/mysql/pt-heartbea*
 -rw-r--r-- 1 root root 49K May 22 09:26 /var/log/mysql/pt-heartbeat.log.3.gz 
 -rw-r--r-- 1 root root 29M May 20 00:00 /var/log/mysql/pt-heartbeat.log.4.gz 
 -rw-r--r-- 1 root root 1.8M Jul 31 2024 /var/log/mysql/pt-heartbeat.log.5.gz
-bash
+```
 
 
 Despite this, a df -h / showed >90% usage, and we noticed space was only freed when we manually restarted the pt-heartbeat service:
 
 ```bash
 systemctl restart pt-heartbeat.service
-bash
+```
 
 ## Root Cause
 
@@ -110,7 +110,7 @@ bash
         fi
     endscript
 }
-bash
+```
 
 2. Excluded pt-heartbeat.log from the MySQL logrotate config
 
@@ -120,7 +120,7 @@ We updated /etc/logrotate.d/mysql:
 /var/log/mysql/*.log
 ! /var/log/mysql/pt-heartbeat.log
 /var/log/mysql/*.err
-bash
+```
 
 This prevents accidental double-rotation or compression of the same file.
 
