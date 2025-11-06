@@ -14,7 +14,7 @@ During peak traffic hours on our **production MySQL primary** (`prod-shard3-db01
 ```bash
 |Opening tables | SELECT ... FROM tbl_abc ...... | 
 Opening tables | SELECT ... FROM tbl_lmn ...... |
-closing tables | SELECT ... FROM tbl_xyz ...
+Closing tables | SELECT ... FROM tbl_xyz ...
 ```
 
 and they were staying there unusually long — in some cases over several seconds.  
@@ -23,7 +23,7 @@ Application performance degraded sharply, with slow responses and intermittent t
 ## 🔍 First Observation: Table Cache Thrashing
 
 Our PMM dashboard “MySQL Table Open Cache Status” confirmed the suspicion —  
-the **Table Open Cache hit ratio dropped to 0%**, while **misses due to overflows** spiked sharply (~60K ops/sec).
+the **Table Open Cache hit ratio dropped to 10%**, while **misses due to overflows** spiked sharply (~60K ops/sec).
 
 ![table cache misses](/assests/images/table_cache_misses.png)
 
@@ -46,19 +46,19 @@ mysql> SHOW GLOBAL VARIABLES LIKE 'table_open_cache';
 We increased it to 3000:
 
 ```sql
-SET GLOBAL table_open_cache = 3000;
+SET PERSIST table_open_cache = 3000;
 ```
 
 Almost immediately, the “Opening tables” entries in the processlist began to disappear and most queries started executing normally again.
 
 However, in PMM we could still see cache misses and a few overflow spikes, indicating that MySQL was still occasionally running out of cached table descriptors during high load.
 
-⚙️ Step 2 — Final Fix: Increase table_open_cache to 8192
+## ⚙️ Step 2 — Final Fix: Increase table_open_cache to 8192
 
 We further bumped the value to 8192:
 
 ```sql
-SET GLOBAL table_open_cache = 8192;
+SET PERSIST table_open_cache = 8192;
 ```
 
 This completely stabilized the cache behavior — the Table Open Cache Hit Ratio went to 100%,
@@ -94,7 +94,7 @@ MySQL refussed it and logged below warnings in the error log
 The root cause?
 
 The OS-level open file limit for the MySQL service (mysqld) was capped at 10,000.
-Since each table and connection consumes file descriptors, MySQL could not honor the higher cache and connection settings, and it automatically reduced table_open_cache down to 300.
+Since each table and connection consumes file descriptors, MySQL could not honor the higher cache and connection settings, and it automatically reduced table_open_cache down to 400.
 
 ```bash
 root@prod-shard3-db01:/home/pankaj# pid=$(pidof mysqld)
@@ -103,7 +103,7 @@ Limit                     Soft Limit           Har
 Max open files            10000                10000                files
 ```
 
-⚠️ Discovery: The “LimitNOFILE=Infinity” That Never Took Effect
+## ⚠️ Discovery: The “LimitNOFILE=Infinity” That Never Took Effect
 
 While reviewing configuration, we found that a systemd override had already been created at:
 
@@ -120,7 +120,7 @@ At first glance, this should have allowed MySQL to open unlimited file descripto
 the MySQL service was never restarted after adding the override file.
 The LimitNOFILE=Infinity directive was not yet applied to the running systemd service. We verfied this by comparing mysql uptime (mysqladmin status), with the commit for the change made to the override file.
 
-🔄 Step 3 — Restart to Apply the Systemd Override
+## 🔄 Step 3 — Restart to Apply the Systemd Override
 
 After restarting the MySQL service during a maintenance window:
 
@@ -137,7 +137,7 @@ Max open files: 1048576
 
 Now the OS-level limit comfortably supported our desired table_open_cache and max_connections values.
 
-🧠 Summary
+## 🧠 Summary
 
 This incident reinforced how MySQL performance tuning is as much about the OS layer as it is about MySQL itself.
 
