@@ -13,8 +13,8 @@ During peak traffic hours on our **production MySQL primary** (`prod-shard3-db01
 
 ```bash
 |Opening tables | SELECT ... FROM tbl_abc ...... | 
-Opening tables | SELECT ... FROM tbl_lmn ...... |
-Closing tables | SELECT ... FROM tbl_xyz ...
+|Opening tables | SELECT ... FROM tbl_lmn ...... |
+|Closing tables | SELECT ... FROM tbl_xyz ...... |
 ```
 
 and they were staying there unusually long — in some cases over several seconds.  
@@ -72,7 +72,7 @@ Application latency normalized immediately, and the MySQL Opened_tables status v
 show global status like 'opened_tables'
 ```
 
-🧐 But Why Was table_open_cache So Small Initially?
+## 🧐 But Why Was table_open_cache So Small Initially?
 
 Here’s where it got interesting.
 
@@ -118,7 +118,7 @@ LimitNOFILE=Infinity
 
 At first glance, this should have allowed MySQL to open unlimited file descriptors. That’s when we realized the catch:
 the MySQL service was never restarted after adding the override file.
-The LimitNOFILE=Infinity directive was not yet applied to the running systemd service. We verfied this by comparing mysql uptime (mysqladmin status), with the commit for the change made to the override file.
+The LimitNOFILE=Infinity directive was not yet applied to the running systemd service. We verfied this by comparing mysql uptime (mysqladmin status), with the commit timestamp for the change made to the override file.
 
 ## 🔄 Step 3 — Restart to Apply the Systemd Override
 
