@@ -46,15 +46,7 @@ At the same time, I wanted to:
 
 At a high level, the system looks like this:
 
-UPI Alerts (Email)
-      ↓
-Gmail API
-      ↓
-Python Parser
-      ↓
-ClickHouse
-      ↓
-Grafana
+![upi spend arch](/assests/images/upi-spend-arch.png)
 
 
 And everything runs on my self-hosted home server (An old intel Mac running 24*7 with the help of Amphetamine app), secured with HTTPS and can only be accessed using Tailscale VPN
