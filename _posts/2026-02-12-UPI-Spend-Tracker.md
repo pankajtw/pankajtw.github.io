@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Project: UPI Daily Spend Tracker"
-date: 2026-01-20
+date: 2026-02-12
 categories: [projects]
 tags: [upi, clickhouse, grafana, python, gmail-api]
 ---
@@ -22,9 +22,9 @@ While banks and UPI apps show recent transactions, I felt a few gaps in my day-t
 
 - No easy way to answer:
 
- - Where did my money go today?
+    - Where did my money go today?
 
- - Which merchant do I spend the most on?
+    - Which merchant do I spend the most on?
 
 - No analytics, just raw transactions
 
@@ -47,18 +47,15 @@ At the same time, I wanted to:
 At a high level, the system looks like this:
 
 UPI Alerts (Email)
-        |
-        v
-   Gmail API
-        |
-        v
- Python Parser
-        |
-        v
-  ClickHouse
-        |
-        v
-   Grafana
+      ↓
+Gmail API
+      ↓
+Python Parser
+      ↓
+ClickHouse
+      ↓
+Grafana
+
 
 And everything runs on my self-hosted home server (An old intel Mac running 24*7 with the help of Amphetamine app), secured with HTTPS and can only be accessed using Tailscale VPN
 
