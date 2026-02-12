@@ -71,6 +71,8 @@ What I did:
 
 - Enabled HTTPS using Let’s Encrypt
 
+- Used Tailscale VPN
+
 This gave me:
 
 - A proper DNS name instead of IPs
@@ -201,94 +203,60 @@ Once data landed here, queries like:
 
 became trivial and fast.
 
-Visualizing with Grafana
+## Visualizing with Grafana
 
-This is where everything comes together.
+This is where everything comes together. Dashboards include:
 
-Dashboards include:
+- Daily spend bar chart
 
-Daily spend bar chart
+- Total spend today
 
-Total spend today
+- Month-to-date spend
 
-Month-to-date spend
+- Merchant-wise breakdown
 
-Merchant-wise breakdown
-
-Drill-down Feature (My Favorite Part)
+- Drill-down Feature (My Favorite Part)
 
 Clicking on a day lets me:
 
-Drill down into per-merchant spend
+    - Drill down into per-merchant spend
 
 Instantly answer:
 
-Where did my money go on this specific day?
+    - Where did my money go on this specific day?
 
 This makes the dashboard interactive, not just pretty.
 
 ![merchant drill down](/assests/images/merchant-drill-down.png)
 
 
-What the Dashboard Achieves
+What the Dashboard Achieves; With one glance, I can now: Track spending patterns, Identify high-frequency merchants, Notice anomalies immediately ,Make more conscious spending decisions. And most importantly: I actually use this dashboard daily.
 
-With one glance, I can now:
+## Work in Progress: Available Balance via Kafka
 
-Track spending patterns
-
-Identify high-frequency merchants
-
-Notice anomalies immediately
-
-Make more conscious spending decisions
-
-And most importantly:
-
-I actually use this dashboard daily.
-
-Work in Progress: Available Balance via Kafka
-
-One feature I’m actively building:
-
-Real-time available balance tracking
-
-Balance change events produced to Kafka
-
-Consumers update balance state
-
-Grafana panel shows live available balance
-
-This introduces:
-
-Event-driven architecture
-
-Streaming instead of batch
-
-Stateful processing
+One feature I’m actively building: Real-time available balance tracking, balance change events produced to Kafka, Consumers update balance state, Grafana panel shows live available balance. This introduces: Event-driven architecture, Streaming instead of batch, Stateful processing
 
 Still WIP — but intentionally so.
 
-What I Learned from This Project
+## What I Learned from This Project
 
 This project touched almost every layer:
 
-OAuth & APIs
+- OAuth & APIs
 
-Secure networking (DNS, TLS, reverse proxy)
+- Secure networking (DNS, TLS, reverse proxy)
 
-Data ingestion pipelines
+- Data ingestion pipelines
 
-Parsing messy real-world data
+- Parsing messy real-world data
 
-Columnar analytics databases
+- Columnar analytics databases
 
-Visualization & drilldowns
+- Visualization & drilldowns
 
-Event-driven design (Kafka)
+- Event-driven design (Kafka)
 
 But the biggest takeaway:
 
 The best projects come from solving your own problems.
-
-This wasn’t built to “look good on a resume”.
-It was built because I needed it — and that made all the difference.
+This was built because I needed it — and that made all the difference.
