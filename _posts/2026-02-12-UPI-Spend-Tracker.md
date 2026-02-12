@@ -224,7 +224,7 @@ This makes the dashboard interactive, not just pretty.
 
 What the Dashboard Achieves; With one glance, I can now: Track spending patterns, Identify high-frequency merchants, Notice anomalies immediately ,Make more conscious spending decisions. And most importantly: I actually use this dashboard daily.
 
-## Daily 9PM Spend Summary Email
+## Daily 9:15 PM Spend Summary Email
 
 Dashboards are useful — but they require you to open them. So I added a daily automated spend summary email that goes out every night at 9 PM to me and my wife. A scheduled job: Queries ClickHouse for total spend of the day, Generates a merchant-wise breakdown, Sends a clean summary via Gmail API. This turned the system from a passive dashboard into a proactive financial awareness tool. Now, instead of checking manually, we automatically get a concise snapshot of our daily spending.
 
